@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+```
+<title>Should I Evolve This Pokémon?</title>
+
+<link rel="stylesheet" href="style.css">
+```
+
+</head>
+
+<body>
+
+```
+<main class="container">
+
+    <h1>Should I evolve this Pokémon?</h1>
+
+    <p class="subtitle">
+        Enter a Pokémon name and get a simple evolution recommendation.
+    </p>
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="pokemonInput"
+            placeholder="Example: pikachu"
+        >
+
+        <button id="searchButton">
+            Check Pokémon
+        </button>
+
+    </div>
+
+    <div id="result" class="result hidden">
+
+        <div id="loading" class="loading hidden">
+            Loading...
+        </div>
+
+        <div id="pokemonInfo">
+
+            <img
+                id="pokemonImage"
+                src=""
+                alt="Pokémon image"
+            >
+
+            <h2 id="pokemonName"></h2>
+
+            <p id="pokemonStats"></p>
+
+            <div id="recommendation" class="recommendation"></div>
+
+            <div id="evolutionInfo"></div>
+
+        </div>
+
+    </div>
+
+    <p id="errorMessage" class="error"></p>
+
+</main>
+
+<script src="script.js"></script>
+```
+
+</body>
+</html>
