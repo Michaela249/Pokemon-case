@@ -1,6 +1,6 @@
-* {
-  box-sizing: border-box;
-  }
+{
+box-sizing: border-box;
+}
 
 body {
 margin: 0;
@@ -20,7 +20,7 @@ padding: 20px;
 
 .container {
 width: 100%;
-max-width: 600px;
+max-width: 700px;
 
 background: white;
 
@@ -49,8 +49,13 @@ display: flex;
 gap: 10px;
 }
 
-input {
+.autocomplete {
+position: relative;
 flex: 1;
+}
+
+input {
+width: 100%;
 
 padding: 12px;
 
@@ -79,8 +84,42 @@ cursor: pointer;
 
 }
 
-button:hover {
+button {
 background: #c92f3a;
+}
+
+.suggestions {
+position: absolute;
+
+top: 100%;
+left: 0;
+right: 0;
+
+background: white;
+
+border: 1px solid #ddd;
+
+border-top: none;
+
+border-radius: 0 0 8px 8px;
+
+z-index: 10;
+
+text-align: left;
+
+}
+
+.suggestion {
+padding: 10px 12px;
+
+cursor: pointer;
+
+text-transform: capitalize;
+
+}
+
+.suggestion {
+background: #f1f1f1;
 }
 
 .result {
@@ -91,17 +130,67 @@ margin-top: 30px;
 display: none;
 }
 
-#pokemonImage {
-width: 180px;
-height: 180px;
+.loading {
+font-size: 18px;
+margin: 20px;
+}
+
+#pokemonName {
+margin-bottom: 10px;
+}
+
+#pokemonStats {
+font-weight: bold;
+}
+
+.evolution-display {
+display: flex;
+
+justify-content: center;
+
+align-items: center;
+
+gap: 25px;
+
+margin: 25px 0;
+
+}
+
+.pokemon-card {
+width: 200px;
+
+padding: 15px;
+
+border-radius: 15px;
+
+background: #f8f8f8;
+
+box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+
+}
+
+.pokemon-card img {
+width: 150px;
+height: 150px;
 
 object-fit: contain;
 
 }
 
-#pokemonName {
+.pokemon-card h3 {
+margin: 5px 0;
+
 text-transform: capitalize;
-margin-bottom: 10px;
+
+}
+
+.arrow {
+font-size: 50px;
+
+font-weight: bold;
+
+color: #e63946;
+
 }
 
 .recommendation {
@@ -111,7 +200,7 @@ padding: 20px;
 
 border-radius: 10px;
 
-font-size: 18px;
+font-size: 20px;
 
 font-weight: bold;
 
@@ -129,15 +218,29 @@ color: #9d0208;
 
 .error {
 margin-top: 20px;
+
 color: red;
+
 font-weight: bold;
+
 }
 
-.loading {
-font-size: 18px;
-margin: 20px;
+@media (max-width: 600px) {
+
+.container {
+    padding: 25px;
 }
 
-#evolutionInfo {
-margin-top: 20px;
+.search-box {
+    flex-direction: column;
+}
+
+.evolution-display {
+    flex-direction: column;
+}
+
+.arrow {
+    transform: rotate(90deg);
+}
+
 }
