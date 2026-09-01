@@ -4,15 +4,15 @@ const suggestions = document.getElementById("suggestions");
 
 const result = document.getElementById("result");
 const nameElement = document.getElementById("pokemonName");
-const stats = document.getElementById("pokemonStats");
 const recommendation = document.getElementById("recommendation");
 const evolutionInfo = document.getElementById("evolutionInfo");
 const evolutionDisplay = document.getElementById("evolutionDisplay");
+const statsComparison = document.getElementById("statsComparison");
 const error = document.getElementById("errorMessage");
 
 let allPokemon = [];
 
-// Load all Pokémon names when the page starts
+// Load Pokémon names
 async function loadPokemonList() {
 
 try {
@@ -29,18 +29,17 @@ try {
 
 } catch (err) {
 
-    console.error("Could not load Pokémon list.", err);
+    console.error(err);
 
 }
 
 }
 
-// Show suggestions while typing
+// Autocomplete
 input.addEventListener("input", function() {
 
-const search = input.value
-    .trim()
-    .toLowerCase();
+const search =
+    input.value.trim().toLowerCase();
 
 suggestions.innerHTML = "";
 
@@ -55,21 +54,25 @@ const matches = allPokemon
 
 matches.forEach(function(name) {
 
-    const item = document.createElement("div");
+    const item =
+        document.createElement("div");
 
     item.className = "suggestion";
 
     item.textContent = name;
 
-    item.addEventListener("click", function() {
+    item.addEventListener(
+        "click",
+        function() {
 
-        input.value = name;
+            input.value = name;
 
-        suggestions.innerHTML = "";
+            suggestions.innerHTML = "";
 
-        searchPokemon();
+            searchPokemon();
 
-    });
+        }
+    );
 
     suggestions.appendChild(item);
 
@@ -78,25 +81,31 @@ matches.forEach(function(name) {
 });
 
 // Search button
-button.addEventListener("click", searchPokemon);
+button.addEventListener(
+"click",
+searchPokemon
+);
 
-// Press Enter
-input.addEventListener("keydown", function(event) {
+// Enter key
+input.addEventListener(
+"keydown",
+function(event) {
 
-if (event.key === "Enter") {
+    if (event.key === "Enter") {
 
-    searchPokemon();
+        searchPokemon();
+
+    }
 
 }
 
-});
+);
 
-// Main Pokémon search
+// Main search
 async function searchPokemon() {
 
-const name = input.value
-    .trim()
-    .toLowerCase();
+const name =
+    input.value.trim().toLowerCase();
 
 
 if (name === "") {
@@ -115,9 +124,8 @@ error.textContent = "";
 
 result.classList.remove("hidden");
 
-nameElement.textContent = "Loading...";
-
-stats.textContent = "";
+nameElement.textContent =
+    "Loading...";
 
 recommendation.textContent = "";
 
@@ -125,10 +133,12 @@ evolutionInfo.textContent = "";
 
 evolutionDisplay.innerHTML = "";
 
+statsComparison.innerHTML = "";
+
 
 try {
 
-    // Get Pokémon data
+    // Current Pokémon
     const response = await fetch(
         "https://pokeapi.co/api/v2/pokemon/" + name
     );
@@ -136,51 +146,39 @@ try {
 
     if (!response.ok) {
 
-        throw new Error("Pokémon not found.");
+        throw new Error(
+            "Pokémon not found"
+        );
 
     }
 
 
-    const pokemon = await response.json();
+    const pokemon =
+        await response.json();
 
 
     nameElement.textContent =
         capitalize(pokemon.name);
 
 
-    // Show stats
-    let totalStats = 0;
-
-    for (const stat of pokemon.stats) {
-
-        totalStats += stat.base_stat;
-
-    }
-
-
-    stats.textContent =
-        "Total base stats: " + totalStats;
-
-
-    // Get species data
-    const speciesResponse = await fetch(
-        pokemon.species.url
-    );
+    // Species
+    const speciesResponse =
+        await fetch(pokemon.species.url);
 
     const species =
         await speciesResponse.json();
 
 
-    // Get evolution chain
-    const evolutionResponse = await fetch(
-        species.evolution_chain.url
-    );
+    // Evolution chain
+    const evolutionResponse =
+        await fetch(
+            species.evolution_chain.url
+        );
 
     const evolutionData =
         await evolutionResponse.json();
 
 
-    // Find current Pokémon
     const current =
         findPokemonInChain(
             evolutionData.chain,
@@ -188,6 +186,7 @@ try {
         );
 
 
+    // Has evolution
     if (
         current &&
         current.evolves_to.length > 0
@@ -198,85 +197,116 @@ try {
                 .species.name;
 
 
-        // Get next evolution data
-        const nextResponse = await fetch(
-            "https://pokeapi.co/api/v2/pokemon/" +
-            nextName
-        );
+        // Next Pokémon
+        const nextResponse =
+            await fetch(
+                "https://pokeapi.co/api/v2/pokemon/" +
+                nextName
+            );
 
         const nextPokemon =
             await nextResponse.json();
 
 
-        // Show evolution
+        // Show Pokémon side by side
         evolutionDisplay.innerHTML = `
 
-            <div class="pokemon-card">
+            <div class="evolution-display">
 
-                <img
-                    src="${getImage(pokemon)}"
-                    alt="${pokemon.name}"
-                >
+                <div class="pokemon-card">
 
-                <h3>
-                    ${capitalize(pokemon.name)}
-                </h3>
+                    <img
+                        src="${getImage(pokemon)}"
+                        alt="${pokemon.name}"
+                    >
 
-                <p>
-                    Current
-                </p>
+                    <h3>
+                        ${capitalize(pokemon.name)}
+                    </h3>
 
-            </div>
+                    <p>
+                        Current
+                    </p>
 
-
-            <div class="arrow">
-                →
-            </div>
+                </div>
 
 
-            <div class="pokemon-card">
+                <div class="arrow">
+                    →
+                </div>
 
-                <img
-                    src="${getImage(nextPokemon)}"
-                    alt="${nextPokemon.name}"
-                >
 
-                <h3>
-                    ${capitalize(nextPokemon.name)}
-                </h3>
+                <div class="pokemon-card">
 
-                <p>
-                    Evolution
-                </p>
+                    <img
+                        src="${getImage(nextPokemon)}"
+                        alt="${nextPokemon.name}"
+                    >
+
+                    <h3>
+                        ${capitalize(nextPokemon.name)}
+                    </h3>
+
+                    <p>
+                        Evolution
+                    </p>
+
+                </div>
 
             </div>
 
         `;
 
 
-        recommendation.textContent =
-            "YES — Evolve!";
+        // Show stats comparison
+        showStatsComparison(
+            pokemon,
+            nextPokemon
+        );
 
 
-        recommendation.className =
-            "recommendation evolve";
+        // Recommendation
+        const currentTotal =
+            getTotalStats(pokemon);
+
+        const nextTotal =
+            getTotalStats(nextPokemon);
 
 
-        evolutionInfo.innerHTML =
+        if (nextTotal > currentTotal) {
 
-            "<p>" +
+            recommendation.textContent =
+                "YES — Evolve!";
 
-            "<strong>" +
-            capitalize(pokemon.name) +
-            "</strong>" +
+            recommendation.className =
+                "recommendation evolve";
 
-            " can evolve into " +
 
-            "<strong>" +
-            capitalize(nextPokemon.name) +
-            "</strong>." +
+            evolutionInfo.innerHTML =
+                "<p>" +
+                "<strong>" +
+                capitalize(pokemon.name) +
+                "</strong> evolves into " +
+                "<strong>" +
+                capitalize(nextPokemon.name) +
+                "</strong> and has higher total base stats." +
+                "</p>";
 
-            "</p>";
+        } else {
+
+            recommendation.textContent =
+                "NO — Do not evolve yet.";
+
+            recommendation.className =
+                "recommendation do-not-evolve";
+
+
+            evolutionInfo.innerHTML =
+                "<p>" +
+                "The evolution does not have higher total base stats." +
+                "</p>";
+
+        }
 
 
     } else {
@@ -285,45 +315,45 @@ try {
         // Final evolution
         evolutionDisplay.innerHTML = `
 
-            <div class="pokemon-card">
+            <div class="evolution-display">
 
-                <img
-                    src="${getImage(pokemon)}"
-                    alt="${pokemon.name}"
-                >
+                <div class="pokemon-card">
 
-                <h3>
-                    ${capitalize(pokemon.name)}
-                </h3>
+                    <img
+                        src="${getImage(pokemon)}"
+                        alt="${pokemon.name}"
+                    >
 
-                <p>
-                    Final evolution
-                </p>
+                    <h3>
+                        ${capitalize(pokemon.name)}
+                    </h3>
+
+                    <p>
+                        Final evolution
+                    </p>
+
+                </div>
 
             </div>
 
         `;
 
 
+        statsComparison.innerHTML = "";
+
+
         recommendation.textContent =
             "NO — Do not evolve.";
-
 
         recommendation.className =
             "recommendation do-not-evolve";
 
 
         evolutionInfo.innerHTML =
-
             "<p>" +
-
             "<strong>" +
             capitalize(pokemon.name) +
-            "</strong>" +
-
-            " is already at the final stage " +
-            "of its evolution chain." +
-
+            "</strong> is already at the final stage of its evolution chain." +
             "</p>";
 
     }
@@ -335,9 +365,9 @@ try {
 
     nameElement.textContent = "";
 
-    stats.textContent = "";
-
     evolutionDisplay.innerHTML = "";
+
+    statsComparison.innerHTML = "";
 
     recommendation.textContent = "";
 
@@ -350,17 +380,161 @@ try {
 
 }
 
-// Find Pokémon inside evolution chain
-function findPokemonInChain(node, pokemonName) {
+// Stats comparison
+function showStatsComparison(
+current,
+evolution
+) {
 
-if (node.species.name === pokemonName) {
+const statNames = [
+    "HP",
+    "Attack",
+    "Defense",
+    "Sp. Attack",
+    "Sp. Defense",
+    "Speed"
+];
+
+
+let currentTotal = 0;
+let evolutionTotal = 0;
+
+
+let rows = "";
+
+
+for (let i = 0; i < 6; i++) {
+
+    const currentValue =
+        current.stats[i].base_stat;
+
+    const evolutionValue =
+        evolution.stats[i].base_stat;
+
+
+    currentTotal += currentValue;
+
+    evolutionTotal += evolutionValue;
+
+
+    const currentClass =
+        currentValue >= evolutionValue
+            ? "stat-better"
+            : "";
+
+
+    const evolutionClass =
+        evolutionValue >= currentValue
+            ? "stat-better"
+            : "";
+
+
+    rows += `
+
+        <tr>
+
+            <td>
+                ${statNames[i]}
+            </td>
+
+            <td class="${currentClass}">
+                ${currentValue}
+            </td>
+
+            <td class="${evolutionClass}">
+                ${evolutionValue}
+            </td>
+
+        </tr>
+
+    `;
+
+}
+
+
+rows += `
+
+    <tr class="total-row">
+
+        <td>
+            Total
+        </td>
+
+        <td>
+            ${currentTotal}
+        </td>
+
+        <td>
+            ${evolutionTotal}
+        </td>
+
+    </tr>
+
+`;
+
+
+statsComparison.innerHTML = `
+
+    <div class="stats-comparison">
+
+        <h3>
+            Base Stats Comparison
+        </h3>
+
+        <table class="stats-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Stat
+                    </th>
+
+                    <th>
+                        ${capitalize(current.name)}
+                    </th>
+
+                    <th>
+                        ${capitalize(evolution.name)}
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                ${rows}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+`;
+
+}
+
+// Find Pokémon in evolution chain
+function findPokemonInChain(
+node,
+pokemonName
+) {
+
+if (
+    node.species.name === pokemonName
+) {
 
     return node;
 
 }
 
 
-for (const evolution of node.evolves_to) {
+for (
+    const evolution of node.evolves_to
+) {
 
     const found =
         findPokemonInChain(
@@ -382,23 +556,42 @@ return null;
 
 }
 
-// Get Pokémon image
+// Get image
 function getImage(pokemon) {
 
 return (
-    pokemon.sprites.other["official-artwork"].front_default ||
+    pokemon.sprites.other[
+        "official-artwork"
+    ].front_default ||
     pokemon.sprites.front_default
 );
 
 }
 
-// Capitalize Pokémon name
-function capitalize(text) {
+// Get total base stats
+function getTotalStats(pokemon) {
 
-return text.charAt(0).toUpperCase() +
-    text.slice(1);
+let total = 0;
+
+for (const stat of pokemon.stats) {
+
+    total += stat.base_stat;
 
 }
 
-// Start loading Pokémon names
+return total;
+
+}
+
+// Capitalize
+function capitalize(text) {
+
+return (
+    text.charAt(0).toUpperCase() +
+    text.slice(1)
+);
+
+}
+
+// Start
 loadPokemonList();
