@@ -1,3 +1,4 @@
+:::writing{variant="document" id="52741"}
 const pokemonInput = document.getElementById("pokemonInput");
 const searchButton = document.getElementById("searchButton");
 
@@ -16,139 +17,165 @@ const errorMessage = document.getElementById("errorMessage");
 searchButton.addEventListener("click", getPokemon);
 
 pokemonInput.addEventListener("keydown", function(event) {
-if (event.key === "Enter") {
-getPokemon();
-}
+    if (event.key === "Enter") {
+        getPokemon();
+    }
 });
 
 async function getPokemon() {
-const pokemon = pokemonInput.value.trim().toLowerCase();
+    const pokemon = pokemonInput.value.trim().toLowerCase();
 
-```
-if (pokemon === "") {
-    errorMessage.textContent = "Please enter a Pokémon name.";
-    return;
-}
-
-errorMessage.textContent = "";
-
-result.classList.remove("hidden");
-loading.classList.remove("hidden");
-
-pokemonImage.src = "";
-pokemonName.textContent = "";
-pokemonStats.textContent = "";
-recommendation.textContent = "";
-evolutionInfo.innerHTML = "";
-
-try {
-    const pokemonResponse = await fetch(
-        "https://pokeapi.co/api/v2/pokemon/" + pokemon
-    );
-
-    if (!pokemonResponse.ok) {
-        throw new Error("Pokemon not found");
+    if (pokemon === "") {
+        errorMessage.textContent = "Please enter a Pokémon name.";
+        return;
     }
 
-    const pokemonData = await pokemonResponse.json();
+    errorMessage.textContent = "";
 
-    pokemonName.textContent = capitalize(pokemonData.name);
+    result.classList.remove("hidden");
+    loading.classList.remove("hidden");
 
-    pokemonImage.src =
-        pokemonData.sprites.other["official-artwork"].front_default ||
-        pokemonData.sprites.front_default;
+    pokemonImage.src = "";
+    pokemonName.textContent = "";
+    pokemonStats.textContent = "";
+    recommendation.textContent = "";
+    evolutionInfo.innerHTML = "";
 
-    const totalStats = pokemonData.stats.reduce(
-        function(total, stat) {
-            return total + stat.base_stat;
-        },
-        0
-    );
+    try {
+        const pokemonResponse = await fetch(
+            "https://pokeapi.co/api/v2/pokemon/" + pokemon
+        );
 
-    pokemonStats.textContent =
-        "Total base stats: " + totalStats;
+        if (!pokemonResponse.ok) {
+            throw new Error("Pokemon not found");
+        }
 
-    const speciesResponse = await fetch(pokemonData.species.url);
-    const speciesData = await speciesResponse.json();
+        const pokemonData = await pokemonResponse.json();
 
-    const evolutionResponse = await fetch(
-        speciesData.evolution_chain.url
-    );
+        pokemonName.textContent = capitalize(pokemonData.name);
 
-    const evolutionData = await evolutionResponse.json();
+        pokemonImage.src =
+            pokemonData.sprites.other["official-artwork"].front_default ||
+            pokemonData.sprites.front_default;
 
-    const currentNode = findPokemonInChain(
-        evolutionData.chain,
-        pokemonData.name
-    );
+        const totalStats = pokemonData.stats.reduce(
+            function(total, stat) {
+                return total + stat.base_stat;
+            },
+            0
+        );
 
-    if (
-        currentNode &&
-        currentNode.evolves_to.length > 0
-    ) {
-        const nextPokemon =
-            currentNode.evolves_to[0].species.name;
+        pokemonStats.textContent =
+            "Total base stats: " + totalStats;
 
-        recommendation.textContent =
-            "Recommendation: YES, evolve!";
+        const speciesResponse = await fetch(
+            pokemonData.species.url
+        );
 
-        recommendation.className =
-            "recommendation evolve";
+        const speciesData = await speciesResponse.json();
 
-        evolutionInfo.innerHTML =
-            "<p><strong>" +
-            capitalize(pokemonData.name) +
-            "</strong> can evolve into <strong>" +
-            capitalize(nextPokemon) +
-            "</strong>.</p>" +
-            "<p>Evolution usually gives your Pokémon stronger base stats.</p>";
-    } else {
-        recommendation.textContent =
-            "Recommendation: NO evolution available.";
+        const evolutionResponse = await fetch(
+            speciesData.evolution_chain.url
+        );
 
-        recommendation.className =
-            "recommendation do-not-evolve";
+        const evolutionData = await evolutionResponse.json();
 
-        evolutionInfo.innerHTML =
-            "<p>" +
-            capitalize(pokemonData.name) +
-            " is already at the final stage of its evolution chain.</p>";
+        const currentNode = findPokemonInChain(
+            evolutionData.chain,
+            pokemonData.name
+        );
+
+        if (
+            currentNode &&
+            currentNode.evolves_to.length > 0
+        ) {
+            const nextPokemon =
+                currentNode.evolves_to[0].species.name;
+
+            recommendation.textContent =
+                "Recommendation: YES, evolve!";
+
+            recommendation.className =
+                "recommendation evolve";
+
+            evolutionInfo.innerHTML =
+                "<p><strong>" +
+                capitalize(pokemonData.name) +
+                "</strong> can evolve into <strong>" +
+                capitalize(nextPokemon) +
+                "</strong>.</p>" +
+                "<p>Evolution usually gives your Pokémon stronger base stats.</p>";
+
+        } else {
+            recommendation.textContent =
+                "Recommendation: NO evolution available.";
+
+            recommendation.className =
+                "recommendation do-not-evolve";
+
+            evolutionInfo.innerHTML =
+                "<p>" +
+                capitalize(pokemonData.name) +
+                " is already at the final stage of its evolution chain.</p>";
+        }
+
+    } catch (error) {
+        console.error(error);
+
+        errorMessage.textContent =
+            "Something went wrong. Please try another Pokémon.";
+
+    } finally {
+        loading.classList.add("hidden");
     }
-
-} catch (error) {
-    console.error(error);
-
-    errorMessage.textContent =
-        "Something went wrong. Please try another Pokémon.";
-} finally {
-    loading.classList.add("hidden");
-}
-```
-
 }
 
 function findPokemonInChain(node, pokemonName) {
-if (node.species.name === pokemonName) {
-return node;
-}
 
-```
-for (const evolution of node.evolves_to) {
-    const found = findPokemonInChain(
-        evolution,
-        pokemonName
-    );
-
-    if (found) {
-        return found;
+    if (node.species.name === pokemonName) {
+        return node;
     }
-}
 
-return null;
-```
+    for (const evolution of node.evolves_to) {
 
+        const found = findPokemonInChain(
+            evolution,
+            pokemonName
+        );
+
+        if (found) {
+            return found;
+        }
+    }
+
+    return null;
 }
 
 function capitalize(text) {
-return text.charAt(0).toUpperCase() + text.slice(1);
+    return text.charAt(0).toUpperCase() + text.slice(1);
 }
+:::
+
+### 4. Commit
+
+Dole klikni:
+
+**Commit changes**
+
+---
+
+## 5. Počkaj približne 1–2 minúty
+
+Potom otvor:
+
+:contentReference[oaicite:0]{index=0}
+
+A urob **hard refresh**:
+
+**Windows:** `Ctrl + Shift + R`  
+**Mac:** `Cmd + Shift + R`
+
+Potom napíš:
+
+```text
+pikachu
