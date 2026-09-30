@@ -63,6 +63,7 @@
       border-color: #3b82f6;
     }
 
+    /* Zoznam návrhov v rovnakej šírke pod vstupným poľom */
     .suggestions-list {
       position: absolute;
       top: 100%;
@@ -246,7 +247,7 @@
     let allPokemon = [];
     let sortedPokemonList = [];
     const imageBaseUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
-    // Náhradný univerzálny obrázok Pokéballu z internetu
+    // Náhradný univerzálny obrázok Pokéballu
     const fallbackPokeballUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png";
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -265,16 +266,16 @@
           return;
         }
 
+        // Filtrovanie abecedne zoradených pokémonov začínajúcich na zadaný text
         const matches = sortedPokemonList.filter(p => p.pokemon.toLowerCase().startsWith(val));
 
         if (matches.length > 0) {
           suggestions.innerHTML = matches.map(p => {
             const imgUrl = getImageUrl(p) || fallbackPokeballUrl;
             const capitalizedName = capitalize(p.pokemon);
-            const speciesId = p.species_id || "";
             return `
               <div class="suggestion-item" data-name="${capitalizedName}">
-                <img src="${imgUrl}" alt="${capitalizedName}" class="suggestion-icon" onerror="this.onerror=null; this.src='${speciesId ? imageBaseUrl + speciesId + '.png' : fallbackPokeballUrl}';">
+                <img src="${imgUrl}" alt="${capitalizedName}" class="suggestion-icon" onerror="this.onerror=null; this.src='${fallbackPokeballUrl}';">
                 <span>${capitalizedName}</span>
               </div>
             `;
@@ -366,7 +367,7 @@
 
       pokeImages.innerHTML = "";
       const currentImg = getImageUrl(current);
-      pokeImages.appendChild(createImageElement(currentImg, current.pokemon, current));
+      pokeImages.appendChild(createImageElement(currentImg, current.pokemon));
 
       if (nextEvolutions.length > 0) {
         const targetEvo = nextEvolutions[0];
@@ -376,7 +377,7 @@
         arrow.className = "evo-arrow";
         arrow.textContent = "➔";
         pokeImages.appendChild(arrow);
-        pokeImages.appendChild(createImageElement(nextImg, targetEvo.pokemon, targetEvo));
+        pokeImages.appendChild(createImageElement(nextImg, targetEvo.pokemon));
 
         recommendationBadge.textContent = "YES, EVOLVE IT!";
         recommendationBadge.className = "recommendation yes";
@@ -403,26 +404,15 @@
       return null;
     }
 
-    // Vytvorenie obrázka s automatickým záložným obrázkom z internetu (fallback)
-    function createImageElement(src, altText, pokemonObj) {
+    // Ak obrázok na neexistujúcej URL zlyhá (404), kód okamžite prepne na Pokéball
+    function createImageElement(src, altText) {
       const img = document.createElement("img");
       img.src = src || fallbackPokeballUrl;
       img.alt = altText;
       img.className = "pokemon-img";
 
-      // Ak konkrétny obrázok na internete neexistuje (404),
-      // najprv skúsi načítať obrázok základného Pokémona podľa species_id,
-      // a ak ani ten neexistuje, načíta univerzálny Pokéball.
       img.onerror = () => {
-        if (pokemonObj && pokemonObj.species_id) {
-          img.src = `${imageBaseUrl}${pokemonObj.species_id}.png`;
-          // Ak zlyhá aj species_id obrázok, prepne na Pokéball
-          img.onerror = () => {
-            img.src = fallbackPokeballUrl;
-          };
-        } else {
-          img.src = fallbackPokeballUrl;
-        }
+        img.src = fallbackPokeballUrl;
       };
 
       return img;
