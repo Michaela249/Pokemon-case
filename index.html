@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Should I Evolve This Pokemon?</title>
-  <!-- PapaParse for reading pokemon.csv -->
+  <!-- PapaParse pre načítanie pokemon.csv -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
   
   <style>
@@ -44,7 +44,7 @@
       margin-bottom: 25px;
     }
 
-    select, input[type="text"] {
+    input[type="text"] {
       width: 65%;
       padding: 12px 16px;
       border: 2px solid #cbd5e1;
@@ -52,6 +52,10 @@
       font-size: 16px;
       outline: none;
       background-color: white;
+    }
+
+    input[type="text"]:focus {
+      border-color: #3b82f6;
     }
 
     button {
@@ -172,7 +176,9 @@
     <p class="subtitle">Select or search for a Pokémon to check if you should evolve it.</p>
 
     <div class="search-box">
-      <input type="text" id="pokemonInput" placeholder="Enter Pokémon name..." autocomplete="off">
+      <!-- Datalist pre našepkávanie názvov Pokémonov -->
+      <input type="text" id="pokemonInput" list="pokemonDatalist" placeholder="Type a Pokémon name..." autocomplete="off">
+      <datalist id="pokemonDatalist"></datalist>
       <button id="searchBtn">Check</button>
     </div>
 
@@ -196,8 +202,19 @@
       loadPokemonData();
 
       document.getElementById("searchBtn").addEventListener("click", handleSearch);
+      
+      // Vyhodnotenie po stlačení Enter
       document.getElementById("pokemonInput").addEventListener("keypress", (e) => {
         if (e.key === "Enter") handleSearch();
+      });
+
+      // Vyhodnotenie po kliknutí/výbere konkrétneho názvu zo zoznamu datalistu
+      document.getElementById("pokemonInput").addEventListener("input", (e) => {
+        const val = e.target.value.trim().toLowerCase();
+        const exists = allPokemon.some(p => p.pokemon && p.pokemon.toLowerCase() === val);
+        if (exists) {
+          handleSearch();
+        }
       });
     });
 
@@ -212,11 +229,25 @@
           skipEmptyLines: true,
           complete: (results) => {
             allPokemon = results.data;
+            populateDatalist();
           }
         });
       } catch (err) {
         console.error("Error loading CSV file:", err);
       }
+    }
+
+    // Naplnenie našepkávača Pokémonmi z CSV
+    function populateDatalist() {
+      const datalist = document.getElementById("pokemonDatalist");
+      datalist.innerHTML = "";
+      allPokemon.forEach(p => {
+        if (p.pokemon) {
+          const option = document.createElement("option");
+          option.value = capitalize(p.pokemon);
+          datalist.appendChild(option);
+        }
+      });
     }
 
     function handleSearch() {
@@ -226,7 +257,6 @@
       const currentPokemon = allPokemon.find(p => p.pokemon && p.pokemon.toLowerCase() === inputVal);
 
       if (!currentPokemon) {
-        alert("Pokémon not found. Please check the spelling.");
         return;
       }
 
