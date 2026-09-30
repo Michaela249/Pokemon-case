@@ -1,72 +1,38 @@
 <!DOCTYPE html>
-
-<html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Should I Evolve This Pokémon?</title>
-
-<link rel="stylesheet" href="style.css">
-
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Should I Evolve This Pokemon?</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 </head>
-
 <body>
 
-<main class="container">
-
-    <h1>Should I evolve this Pokémon?</h1>
-
-    <p class="subtitle">
-        Search for a Pokémon and find out if evolving is recommended.
-    </p>
+  <main class="container">
+    <h1>Should I Evolve This Pokemon?</h1>
+    <p class="subtitle">Search or select a Pokémon to see if it can evolve and compare its stats.</p>
 
     <div class="search-box">
-
-        <div class="autocomplete">
-            <input
-                type="text"
-                id="pokemonInput"
-                placeholder="Search Pokémon..."
-                autocomplete="off"
-            >
-
-            <div id="suggestions" class="suggestions"></div>
-        </div>
-
-        <button id="searchButton">
-            Check Pokémon
-        </button>
-
+      <input type="text" id="pokemonInput" list="pokemonDatalist" placeholder="Type a Pokémon name..." autocomplete="off">
+      <datalist id="pokemonDatalist"></datalist>
+      <button id="searchBtn">Check</button>
     </div>
 
-    <div id="result" class="result hidden">
+    <div id="resultCard" class="card" style="display: none;">
+      <div id="pokemonHeader">
+        <h2 id="pokeName"></h2>
+        <div id="pokeImages" class="images-container"></div>
+      </div>
 
-        <div id="loading" class="loading hidden">
-            Loading...
-        </div>
+      <div id="recommendationBadge" class="recommendation"></div>
 
-        <div id="pokemonInfo">
+      <div id="evolutionInfo" class="evolution-details"></div>
 
-            <h2 id="pokemonName"></h2>
-
-           <div id="evolutionDisplay"></div>
-
-<div id="statsComparison"></div>
-
-<div id="recommendation" class="recommendation"></div>
-
-<div id="evolutionInfo"></div>
-
-            <div id="recommendation" class="recommendation"></div>
-
-            <div id="evolutionInfo"></div>
-
-        </div>
-
+      <div id="statsComparison" class="stats-container"></div>
     </div>
+  </main>
 
-    <p id="errorMessage" class="error"></p>
-
-</main>
-
-<script src="script.js"></script>
-
-</body> </html>
+  <script src="script.js"></script>
+</body>
+</html>
